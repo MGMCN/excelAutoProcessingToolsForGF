@@ -68,8 +68,8 @@ def readExcelFiles(dir_path):
         print("当前我们正在访问 ->", file)
         book = openpyxl.load_workbook(dir_path + '/' + file)  # 这个/对应MacOS的格式
         sheet_names = book.sheetnames
-        print("当前文件有表格 ->", sheet_names)
-        print("请问你想要读取哪一个sheet，请直接输入那个sheet名(全部都读取请输入all),跳过访问当前文件请输入nothing")
+        print("当前文件有sheet ->", sheet_names)
+        print("当你需要读取某一个sheet的时候，请直接输入那个sheet名(全部都读取请输入all),跳过访问当前文件请输入nothing")
         sheet_name = input()
         if sheet_name == 'all':
             # for loop 处理所有sheet
