@@ -131,3 +131,7 @@ dmypy.json
 
 # MacOS
 .DS_Store
+
+# Excel
+.xlsx
+SourceCode/*.xlsx
