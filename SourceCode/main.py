@@ -63,11 +63,15 @@ def copyFromReturnValue(tsc):
 def readExcelFiles(dir_path):
     fileList = os.listdir(dir_path)
     for file in fileList:
-        if '.xlsx' not in file:
+        if '.xlsx' not in file or 'output' in file:
             continue
         print("当前我们正在访问 ->", file)
         book = openpyxl.load_workbook(dir_path + '/' + file)  # 这个/对应MacOS的格式
         sheet_names = book.sheetnames
+        if len(sheet_names) == 1:
+            tsc = readSheet(book, sheet_name=sheet_names.__getitem__(0))
+            copyFromReturnValue(tsc)
+            continue
         print("当前文件有sheet ->", sheet_names)
         print("当你需要读取某一个sheet的时候，请直接输入那个sheet名(全部都读取请输入all),跳过访问当前文件请输入nothing")
         sheet_name = input()
@@ -124,6 +128,7 @@ def chooseSample(choosed):
     cnt = 0
     calculateDataSet = []
     ans = None
+    ansList = []
     print('choosed ->', choosed)
     for Sample in choosedList:
         # print(Sample)
@@ -134,7 +139,8 @@ def chooseSample(choosed):
         else:
             # 计算一组数据
             ans = calculate(actins=targetToSampleAndCq['Actin'], samples=calculateDataSet, target=choosed)
-            print(ans)
+            ansList.append(ans)
+            # print(ans)
             # 计算完了后添加这次遍历到的Sample
             calculateDataSet = []
             cnt = 1
@@ -142,8 +148,50 @@ def chooseSample(choosed):
 
     # 这儿还得处理最后一次，因为最后一次for loop就终止了
     ans = calculate(actins=targetToSampleAndCq['Actin'], samples=calculateDataSet, target=choosed)
-    print(ans)
-    return ans
+    ansList.append(ans)
+    # print(ans)
+    return ansList
+
+
+def output(target, samples):
+    if not os.path.exists('output.xlsx'):
+        f = openpyxl.Workbook()
+    else:
+        f = openpyxl.load_workbook('output.xlsx')
+
+    f.create_sheet(target)
+    sheet = f[target]
+
+    sheet.cell(row=1, column=1, value='Target')
+    sheet.cell(row=1, column=2, value='Sample')
+    sheet.cell(row=1, column=3, value='Cq')
+    sheet.cell(row=1, column=4, value='2△CqMean')
+
+    row = 2
+    col = 1
+
+    for sample in samples:
+        for sampleName in sample:
+            sheet.cell(row=row, column=col, value='Actin')
+            col += 1
+            sheet.cell(row=row, column=col, value=sampleName)
+            col += 1
+            sheet.cell(row=row, column=col, value=sample[sampleName]['Actin']['CqMean'])
+            col += 1
+            sheet.cell(row=row, column=col, value=sample[sampleName]['2△CqMean'])
+
+            row += 1
+            col = 1
+            sheet.cell(row=row, column=col, value=target)
+            col += 1
+            sheet.cell(row=row, column=col, value=sampleName)
+            col += 1
+            sheet.cell(row=row, column=col, value=sample[sampleName][target]['CqMean'])
+        row += 1
+        col = 1
+
+    f.save("output.xlsx")
+    f.close()
 
 
 if __name__ == "__main__":
@@ -152,4 +200,5 @@ if __name__ == "__main__":
     for target in targetSet:
         if target == 'Actin':
             continue
-        chooseSample(target)
+        ansList = chooseSample(target)
+        output(target, ansList)
