@@ -202,7 +202,7 @@ if __name__ == "__main__":
     readExcelFiles('.')
     # print(targetSet)
     loop = len(targetSet)
-    with tqdm(total=loop) as pbar:
+    with tqdm(total=loop,colour='green') as pbar:
         pbar.set_description('Processing:')
         for i, target in zip(range(loop), targetSet):
             pbar.update(1)
