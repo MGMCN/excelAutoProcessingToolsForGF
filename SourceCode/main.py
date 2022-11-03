@@ -1,5 +1,8 @@
+import time
+
 import openpyxl
 import os
+from tqdm import tqdm
 
 duplicateMode = False  # 做单个sample设置为True
 
@@ -129,7 +132,7 @@ def chooseSample(choosed):
     calculateDataSet = []
     ans = None
     ansList = []
-    print('choosed ->', choosed)
+    # print('choosed ->', choosed)
     for Sample in choosedList:
         # print(Sample)
         # print(calculateDataSet, len(calculateDataSet))
@@ -159,7 +162,8 @@ def output(target, samples):
     else:
         f = openpyxl.load_workbook('output.xlsx')
 
-    f.create_sheet(target)
+    if not f.__contains__(target):
+        f.create_sheet(target)
     sheet = f[target]
 
     sheet.cell(row=1, column=1, value='Target')
@@ -196,9 +200,14 @@ def output(target, samples):
 
 if __name__ == "__main__":
     readExcelFiles('.')
-    print(targetSet)
-    for target in targetSet:
-        if target == 'Actin':
-            continue
-        ansList = chooseSample(target)
-        output(target, ansList)
+    # print(targetSet)
+    loop = len(targetSet)
+    with tqdm(total=loop) as pbar:
+        pbar.set_description('Processing:')
+        for i, target in zip(range(loop), targetSet):
+            pbar.update(1)
+            time.sleep(0.01)
+            if target == 'Actin':
+                continue
+            ansList = chooseSample(target)
+            output(target, ansList)
