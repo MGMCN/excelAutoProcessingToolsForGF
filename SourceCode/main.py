@@ -4,7 +4,7 @@ import openpyxl
 import os
 from tqdm import tqdm
 
-duplicateMode = False  # 做单个sample设置为True
+# duplicateMode = False  # 做单个sample设置为True
 
 targetToSampleAndCq = {}
 
@@ -118,8 +118,11 @@ def calculate(actins, samples, target):
     return ans
 
 
+pace = 3
+
+
 def chooseSample(choosed):
-    global targetToSampleAndCq
+    global targetToSampleAndCq,pace
     choosedList = []
     for Sample in targetToSampleAndCq[choosed]:
         # print(Sample)
@@ -202,11 +205,12 @@ if __name__ == "__main__":
     readExcelFiles('.')
     # print(targetSet)
     loop = len(targetSet)
-    with tqdm(total=loop,colour='green') as pbar:
+    pace = int(input('当你在做单个重复实验的时候请输入1，否则输入3:'))
+    with tqdm(total=loop, colour='green') as pbar:
         pbar.set_description('Processing:')
         for i, target in zip(range(loop), targetSet):
             pbar.update(1)
-            time.sleep(0.01)
+            # time.sleep(0.01)
             if target == 'Actin':
                 continue
             ansList = chooseSample(target)
